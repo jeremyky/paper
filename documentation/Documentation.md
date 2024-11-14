@@ -486,3 +486,85 @@ This integrated approach best serves our remote viewing analysis by:
    - Balance between accuracy and interpretability
    - Facilitates pattern discovery
    - Supports both detailed and overview analysis
+
+### Comparison Analysis: CNN vs SBERT Features
+
+#### Implementation Strategy
+1. **Dimension Matching**
+   - Ensure equal number of samples between CNN and SBERT features
+   - Use sequential sampling to maintain consistency
+   - Preserve image-label correspondence across both analyses
+
+2. **Visualization Framework**
+   - Three separate comparative visualizations:
+     1. Side-by-side dendrograms
+     2. Raw similarity heatmaps
+     3. Interpolated similarity heatmaps
+   - Consistent layout and scaling for direct comparison
+
+3. **Correlation Analysis**
+   - Pearson correlation: Measures linear relationship
+   - Spearman correlation: Measures monotonic relationship
+   - P-values for statistical significance
+   ```python
+   correlation_pearson, p_value_pearson = pearsonr(condensed_dist_matrix_cnn, condensed_dist_matrix_sbert)
+   correlation_spearman, p_value_spearman = spearmanr(condensed_dist_matrix_cnn, condensed_dist_matrix_sbert)
+   ```
+
+#### Visualization Components
+
+1. **Dendrogram Comparison**
+   - Purpose:
+     - Compare hierarchical relationships
+     - Identify clustering patterns
+     - Validate structural similarities
+   - Implementation:
+     - Ward linkage for both methods
+     - Consistent leaf rotation and font size
+     - Aligned distance scales
+
+2. **Raw Similarity Heatmaps**
+   - Purpose:
+     - Compare actual similarity values
+     - Identify relationship strengths
+     - Validate measurement consistency
+   - Features:
+     - Masked diagonal values
+     - Consistent color scaling (-1 to 1)
+     - Original similarity scores
+
+3. **Interpolated Heatmaps**
+   - Purpose:
+     - Enhanced pattern visualization
+     - Relative relationship comparison
+     - Easier interpretation of groupings
+   - Implementation:
+     ```python
+     interpolated_matrix = (similarity_matrix - min_val) / (max_val - min_val)
+     ```
+   - Benefits:
+     - Normalized scale (0 to 1)
+     - Preserved relative relationships
+     - Better visual contrast
+
+#### Analysis Benefits
+1. **Validation**
+   - Cross-validation between visual and semantic features
+   - Confirmation of relationship patterns
+   - Identification of discrepancies
+
+2. **Interpretation**
+   - Multiple perspectives on relationships
+   - Both absolute and relative comparisons
+   - Clear visualization of similarities and differences
+
+3. **Quality Control**
+   - Verification of feature extraction
+   - Validation of clustering approach
+   - Confirmation of analysis consistency
+
+#### Implementation Details
+- Consistent preprocessing
+- Matched sample sizes
+- Aligned visualization parameters
+- Standardized analysis metrics
