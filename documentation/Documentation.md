@@ -568,3 +568,99 @@ This integrated approach best serves our remote viewing analysis by:
 - Matched sample sizes
 - Aligned visualization parameters
 - Standardized analysis metrics
+
+## Automated Image Selection Using Hierarchical Clustering
+
+### Overview
+To automatically select a diverse subset of images from a large database, we use hierarchical clustering with Ward's method. This approach was validated using the CIFAR-100 dataset and can be applied to any image collection.
+
+### Selection Process
+
+1. **Feature Extraction**
+   - Run images through AlexNet's convolutional layers
+   - Extract features from last maxpool layer
+   - Flatten features into vectors
+
+2. **Similarity Matrix Construction**
+   ```python
+   # Compute cosine similarity between all feature vectors
+   similarity_matrix = cosine_similarity(cnn_features)
+   ```
+
+3. **Hierarchical Clustering**
+   ```python
+   # Convert similarities to distances
+   distances = 1 - similarity_matrix
+   
+   # Perform Ward's hierarchical clustering
+   linkage_matrix = linkage(distances, method='ward')
+   
+   # Cut tree to get desired number of clusters
+   clusters = fcluster(linkage_matrix, n_clusters=100, criterion='maxclust')
+   ```
+
+4. **Representative Selection**
+   - For each cluster, select the image closest to cluster center
+   - This ensures selected images are:
+     - Maximally different from each other
+     - Representative of their local neighborhood
+     - Well-distributed across the feature space
+
+### Implementation Methods
+
+1. **Ward's Method**
+   - Minimizes within-cluster variance
+   - Creates compact, balanced clusters
+   - Better than single/complete linkage for this task
+   - Used in CIFAR-100 validation
+
+2. **Center Selection Strategy**
+   ```python
+   for cluster_id in unique_clusters:
+       cluster_indices = np.where(clusters == cluster_id)[0]
+       
+       # Find image closest to cluster center
+       cluster_similarities = similarity_matrix[cluster_indices][:, cluster_indices]
+       mean_similarities = np.mean(cluster_similarities, axis=1)
+       center_idx = cluster_indices[np.argmax(mean_similarities)]
+       
+       selected_indices.append(center_idx)
+   ```
+
+3. **Validation Approach**
+   - Visualize similarity matrix
+   - Check cluster distributions
+   - Analyze intra/inter-cluster distances
+   - Compare selected images visually
+
+### CIFAR-100 Validation Results
+- Successfully selected diverse subsets (20-100 images)
+- Maintained class distribution
+- Achieved good coverage of feature space
+- Validated through visual inspection and similarity metrics
+
+### Advantages of This Approach
+
+1. **Automatic Selection**
+   - No manual intervention needed
+   - Scales to any dataset size
+   - Consistent, reproducible results
+
+2. **Diversity Guarantee**
+   - Each selected image represents a distinct cluster
+   - Maximum separation between selected images
+   - Good coverage of full dataset
+
+3. **Quality Control**
+   - Center selection avoids outliers
+   - Ward's method ensures balanced clusters
+   - Easy to validate through visualization
+
+### Application to New Datasets
+1. Extract CNN features from all images
+2. Compute similarity matrix
+3. Perform hierarchical clustering
+4. Select cluster centers
+5. Validate selections through visualization
+
+This method can automatically select any number of representative images from a larger dataset while ensuring maximum diversity and representativeness.
