@@ -7,6 +7,10 @@ from scipy.spatial.distance import pdist, squareform
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics.pairwise import cosine_similarity
+import torchvision
+from PIL import Image
+import torchvision.transforms as transforms
+from load_cifar100 import load_cifar100
 
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -86,16 +90,19 @@ def select_diverse_images(similarity_matrix, n_select=20, method='ward'):
     
     return selected_indices, clusters
 
-def visualize_clustering(similarity_matrix, metadata, selected_indices=None):
+def visualize_clustering(similarity_matrix, metadata, selected_indices=None, save_dir='output_graphs'):
     """
-    Create dendrogram and heatmap visualizations
+    Create dendrogram and heatmap visualizations and save them
     """
+    # Create output directory if it doesn't exist
+    os.makedirs(save_dir, exist_ok=True)
+    
     # Create figure with two subplots
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(20, 8))
     
     # Convert similarities to distances and ensure diagonal is exactly 0
     distances = 1 - similarity_matrix
-    np.fill_diagonal(distances, 0)  # Force diagonal to be exactly 0
+    np.fill_diagonal(distances, 0)
     
     # Convert to condensed form for linkage
     condensed_distances = squareform(distances)
@@ -103,9 +110,11 @@ def visualize_clustering(similarity_matrix, metadata, selected_indices=None):
     # Compute linkage matrix
     linkage_matrix = linkage(condensed_distances, method='ward')
     
-    # Plot dendrogram
+    # Create labels with both class name and index for better tracking
     labels = [f"{m['class_name']}_{m['index']}" for m in metadata]
-    dendrogram(
+    
+    # Plot dendrogram
+    dendrogram_dict = dendrogram(
         linkage_matrix,
         labels=labels,
         leaf_rotation=90,
@@ -114,34 +123,57 @@ def visualize_clustering(similarity_matrix, metadata, selected_indices=None):
     )
     ax1.set_title("Hierarchical Clustering Dendrogram")
     
-    # Plot heatmap
-    mask = np.eye(len(similarity_matrix), dtype=bool)
+    # Get the order of leaves from dendrogram
+    leaf_order = dendrogram_dict['leaves']
+    
+    # Reorder similarity matrix to match dendrogram
+    ordered_sim = similarity_matrix[leaf_order][:, leaf_order]
+    ordered_labels = [labels[i] for i in leaf_order]
+    
+    # Plot heatmap with ordered indices
+    mask = np.eye(len(ordered_sim), dtype=bool)
     sns.heatmap(
-        similarity_matrix,
+        ordered_sim,
         mask=mask,
         cmap='coolwarm',
         center=0,
         annot=False,
-        xticklabels=False,
-        yticklabels=False,
+        xticklabels=ordered_labels,
+        yticklabels=ordered_labels,
         ax=ax2
     )
     ax2.set_title("Similarity Matrix Heatmap")
     
+    # Rotate x-axis labels for better readability
+    ax2.set_xticklabels(ax2.get_xticklabels(), rotation=90)
+    ax2.set_yticklabels(ax2.get_yticklabels(), rotation=0)
+    
     if selected_indices is not None:
+        # Convert selected indices to positions in ordered matrix
+        ordered_positions = [leaf_order.index(idx) for idx in selected_indices]
         # Highlight selected images in heatmap
-        for idx in selected_indices:
-            ax2.axhline(y=idx, color='g', alpha=0.3)
-            ax2.axvline(x=idx, color='g', alpha=0.3)
+        for pos in ordered_positions:
+            ax2.axhline(y=pos, color='g', alpha=0.3)
+            ax2.axvline(x=pos, color='g', alpha=0.3)
     
     plt.tight_layout()
+    
+    # Save the figure
+    fig.savefig(os.path.join(save_dir, 'full_dataset_visualization.png'), 
+                bbox_inches='tight', 
+                dpi=300)
+    
     plt.show()
+    return fig
 
-def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_indices):
+def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_indices, save_dir='output_graphs'):
     """
     Create side-by-side visualizations comparing CNN and SBERT similarities
-    for the selected subset of images
+    and save them
     """
+    # Create output directory if it doesn't exist
+    os.makedirs(save_dir, exist_ok=True)
+    
     # Extract the submatrices for selected indices
     reduced_cnn = cnn_similarity[np.ix_(selected_indices, selected_indices)]
     reduced_sbert = sbert_similarity[np.ix_(selected_indices, selected_indices)]
@@ -150,7 +182,7 @@ def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_in
     # Create figure with four subplots (2x2)
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(20, 16))
     
-    # Labels for both visualizations
+    # Create consistent labels for all plots
     labels = [f"{m['class_name']}_{m['index']}" for m in reduced_metadata]
     
     # CNN Dendrogram
@@ -159,7 +191,8 @@ def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_in
     condensed_distances_cnn = squareform(distances_cnn)
     linkage_matrix_cnn = linkage(condensed_distances_cnn, method='ward')
     
-    dendrogram(
+    # Plot CNN dendrogram and get leaf order
+    dendrogram_dict_cnn = dendrogram(
         linkage_matrix_cnn,
         labels=labels,
         leaf_rotation=90,
@@ -168,13 +201,18 @@ def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_in
     )
     ax1.set_title("CNN Features Dendrogram")
     
+    # Get CNN leaf order
+    cnn_leaf_order = dendrogram_dict_cnn['leaves']
+    ordered_labels_cnn = [labels[i] for i in cnn_leaf_order]
+    
     # SBERT Dendrogram
     distances_sbert = 1 - reduced_sbert
     np.fill_diagonal(distances_sbert, 0)
     condensed_distances_sbert = squareform(distances_sbert)
     linkage_matrix_sbert = linkage(condensed_distances_sbert, method='ward')
     
-    dendrogram(
+    # Plot SBERT dendrogram and get leaf order
+    dendrogram_dict_sbert = dendrogram(
         linkage_matrix_sbert,
         labels=labels,
         leaf_rotation=90,
@@ -183,37 +221,58 @@ def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_in
     )
     ax2.set_title("SBERT Features Dendrogram")
     
-    # CNN Heatmap
+    # Get SBERT leaf order
+    sbert_leaf_order = dendrogram_dict_sbert['leaves']
+    ordered_labels_sbert = [labels[i] for i in sbert_leaf_order]
+    
+    # Reorder similarity matrices according to respective dendrograms
+    ordered_cnn = reduced_cnn[cnn_leaf_order][:, cnn_leaf_order]
+    ordered_sbert = reduced_sbert[sbert_leaf_order][:, sbert_leaf_order]
+    
+    # Plot heatmaps with ordered indices
     mask = np.eye(len(reduced_cnn), dtype=bool)
+    
+    # CNN Heatmap
     sns.heatmap(
-        reduced_cnn,
+        ordered_cnn,
         mask=mask,
         cmap='coolwarm',
         center=0,
         annot=True,
         fmt='.2f',
-        xticklabels=labels,
-        yticklabels=labels,
+        xticklabels=ordered_labels_cnn,
+        yticklabels=ordered_labels_cnn,
         ax=ax3
     )
     ax3.set_title("CNN Similarity Matrix")
+    ax3.set_xticklabels(ax3.get_xticklabels(), rotation=90)
+    ax3.set_yticklabels(ax3.get_yticklabels(), rotation=0)
     
     # SBERT Heatmap
     sns.heatmap(
-        reduced_sbert,
+        ordered_sbert,
         mask=mask,
         cmap='coolwarm',
         center=0,
         annot=True,
         fmt='.2f',
-        xticklabels=labels,
-        yticklabels=labels,
+        xticklabels=ordered_labels_sbert,
+        yticklabels=ordered_labels_sbert,
         ax=ax4
     )
     ax4.set_title("SBERT Similarity Matrix")
+    ax4.set_xticklabels(ax4.get_xticklabels(), rotation=90)
+    ax4.set_yticklabels(ax4.get_yticklabels(), rotation=0)
     
     plt.tight_layout()
+    
+    # Save the figure
+    fig.savefig(os.path.join(save_dir, 'comparison_visualization.png'), 
+                bbox_inches='tight', 
+                dpi=300)
+    
     plt.show()
+    return fig
 
 def analyze_pairs(similarity_matrix, metadata, selected_indices, top_n=10):
     """
@@ -260,7 +319,76 @@ def analyze_pairs(similarity_matrix, metadata, selected_indices, top_n=10):
     
     return pairs
 
+def save_selected_images(dataset, selected_indices, metadata, output_dir='selected_images'):
+    """
+    Save and display the selected images
+    
+    Args:
+        dataset: CIFAR-100 dataset
+        selected_indices: indices of selected images
+        metadata: metadata for the images
+        output_dir: directory to save images
+    """
+    # Create output directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Create a figure to display all selected images
+    n_images = len(selected_indices)
+    n_cols = 5
+    n_rows = (n_images + n_cols - 1) // n_cols
+    
+    fig, axes = plt.subplots(n_rows, n_cols, figsize=(15, 3*n_rows))
+    if n_rows == 1:
+        axes = axes.reshape(1, -1)
+    
+    # Inverse normalization transform
+    inv_normalize = transforms.Normalize(
+        mean=[-0.485/0.229, -0.456/0.224, -0.406/0.225],
+        std=[1/0.229, 1/0.224, 1/0.225]
+    )
+    
+    # Save and display each selected image
+    for idx, (ax, selected_idx) in enumerate(zip(axes.flat, selected_indices)):
+        # Get image and metadata
+        meta = metadata[selected_idx]
+        actual_idx = meta['index']  # Use the index from metadata
+        image, label = dataset[actual_idx]
+        
+        # Verify label matches metadata
+        if label != meta['class_id']:
+            print(f"Warning: Label mismatch for index {actual_idx}")
+            print(f"Dataset label: {label}, Metadata class_id: {meta['class_id']}")
+        
+        # Convert tensor to PIL Image
+        image = inv_normalize(image)
+        image = torch.clamp(image, 0, 1)
+        image = transforms.ToPILImage()(image)
+        
+        # Save image
+        filename = f"{idx+1:02d}_{meta['class_name']}.png"
+        image_path = os.path.join(output_dir, filename)
+        image.save(image_path)
+        
+        # Display image
+        ax.imshow(image)
+        ax.axis('off')
+        ax.set_title(f"{meta['class_name']}\n(#{idx+1})", fontsize=8)
+    
+    # Remove empty subplots
+    for idx in range(len(selected_indices), len(axes.flat)):
+        axes.flat[idx].remove()
+    
+    plt.tight_layout()
+    plt.show()
+    
+    print(f"\nSelected images saved to {output_dir}/")
+    return fig
+
 def main():
+    # Load CIFAR-100 dataset first
+    print("Loading CIFAR-100 dataset...")
+    dataset, class_names = load_cifar100()
+    
     # Load features
     print("Loading features...")
     cnn_features, semantic_features, metadata = load_features()
@@ -278,13 +406,22 @@ def main():
         cnn_similarities, n_select=n_select
     )
     
-    # Visualize full CNN-based clustering
-    print("Creating full dataset visualization (CNN-based)...")
-    visualize_clustering(cnn_similarities, metadata, selected_indices)
+    # Create output directory
+    output_dir = 'output_graphs'
+    os.makedirs(output_dir, exist_ok=True)
     
-    # Compare CNN and SBERT for selected images
-    print("Creating comparison visualizations for selected images...")
-    visualize_comparison(cnn_similarities, semantic_similarities, metadata, selected_indices)
+    # Save all visualizations
+    print("Creating and saving visualizations...")
+    visualize_clustering(cnn_similarities, metadata, selected_indices, output_dir)
+    visualize_comparison(cnn_similarities, semantic_similarities, metadata, selected_indices, output_dir)
+    
+    # Save selected images grid
+    fig = save_selected_images(dataset, selected_indices, metadata)
+    fig.savefig(os.path.join(output_dir, 'selected_images_grid.png'), 
+                bbox_inches='tight', 
+                dpi=300)
+    
+    print(f"\nAll visualizations saved to {output_dir}/")
     
     # Analyze and print most/least similar pairs (CNN-based)
     print("\nAnalyzing CNN-based similarity pairs...")

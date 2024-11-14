@@ -48,8 +48,8 @@ def main():
     output_dir = 'cifar_features'
     os.makedirs(output_dir, exist_ok=True)
     
-    # Load CIFAR-100
-    dataset, class_names = load_cifar100()
+    # Load CIFAR-100 dataset with proper class mapping
+    dataset, class_names, class_to_idx, idx_to_class = load_cifar100()
     subset_dataset, selected_indices, selected_labels = get_class_samples(dataset)
     
     # Initialize models
@@ -97,11 +97,11 @@ def main():
                 semantic_embedding = sbert_model.encode(description)
                 semantic_features.append(semantic_embedding)
                 
-                # Store metadata
+                # Store metadata with correct class name
                 metadata.append({
-                    'index': global_idx,
+                    'index': selected_indices[global_idx],  # Store original dataset index
                     'class_id': label_idx,
-                    'class_name': class_names[label_idx],
+                    'class_name': idx_to_class[label_idx],
                     'description': description,
                     'feature_file': feature_filename
                 })

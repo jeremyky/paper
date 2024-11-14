@@ -23,10 +23,11 @@ def load_cifar100(root='./data'):
                                           download=True, 
                                           transform=transform)
     
-    # Get class names
-    class_names = testset.classes
+    # Get class names and create a mapping
+    class_to_idx = {class_name: idx for idx, class_name in enumerate(testset.classes)}
+    idx_to_class = {idx: class_name for class_name, idx in class_to_idx.items()}
     
-    return testset, class_names
+    return testset, testset.classes, class_to_idx, idx_to_class
 
 def get_class_samples(dataset, num_classes=100, samples_per_class=6):
     """
