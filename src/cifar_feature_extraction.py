@@ -7,6 +7,16 @@ from sentence_transformers import SentenceTransformer
 import json
 import torch.utils.data
 
+# Add NumpyEncoder class
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return super(NumpyEncoder, self).default(obj)
 
 class FeatureExtractor:
     def __init__(self, model):
@@ -84,7 +94,7 @@ def main():
             # Process each image in batch
             for idx, (feature, label) in enumerate(zip(batch_features, labels)):
                 global_idx = batch_idx * 32 + idx
-                label_idx = label.item()
+                label_idx = int(label.item())  # Convert to Python int
                 
                 # Save CNN features
                 feature_filename = f"{global_idx}_{label_idx}.pt"
@@ -99,7 +109,7 @@ def main():
                 
                 # Store metadata with correct class name
                 metadata.append({
-                    'index': selected_indices[global_idx],  # Store original dataset index
+                    'index': int(selected_indices[global_idx]),  # Convert to Python int
                     'class_id': label_idx,
                     'class_name': idx_to_class[label_idx],
                     'description': description,
@@ -109,9 +119,9 @@ def main():
         if batch_idx % 10 == 0:
             print(f"Processed batch {batch_idx}")
     
-    # Save metadata and semantic features
+    # Save metadata and semantic features using NumpyEncoder
     with open(os.path.join(output_dir, 'metadata.json'), 'w') as f:
-        json.dump(metadata, f, indent=2)
+        json.dump(metadata, f, indent=2, cls=NumpyEncoder)
     
     semantic_features = np.array(semantic_features)
     np.save(os.path.join(output_dir, 'semantic_features.npy'), semantic_features)

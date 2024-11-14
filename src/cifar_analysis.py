@@ -186,8 +186,13 @@ def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_in
     labels = [f"{m['class_name']}_{m['index']}" for m in reduced_metadata]
     
     # CNN Dendrogram
+    # Ensure distances are non-negative and diagonal is exactly zero
     distances_cnn = 1 - reduced_cnn
-    np.fill_diagonal(distances_cnn, 0)
+    min_dist_cnn = np.min(distances_cnn[~np.eye(len(distances_cnn), dtype=bool)])  # Exclude diagonal
+    if min_dist_cnn < 0:
+        distances_cnn[~np.eye(len(distances_cnn), dtype=bool)] -= min_dist_cnn  # Adjust non-diagonal elements
+    np.fill_diagonal(distances_cnn, 0.0)  # Ensure diagonal is exactly zero
+    
     condensed_distances_cnn = squareform(distances_cnn)
     linkage_matrix_cnn = linkage(condensed_distances_cnn, method='ward')
     
@@ -206,8 +211,13 @@ def visualize_comparison(cnn_similarity, sbert_similarity, metadata, selected_in
     ordered_labels_cnn = [labels[i] for i in cnn_leaf_order]
     
     # SBERT Dendrogram
+    # Ensure distances are non-negative and diagonal is exactly zero
     distances_sbert = 1 - reduced_sbert
-    np.fill_diagonal(distances_sbert, 0)
+    min_dist_sbert = np.min(distances_sbert[~np.eye(len(distances_sbert), dtype=bool)])  # Exclude diagonal
+    if min_dist_sbert < 0:
+        distances_sbert[~np.eye(len(distances_sbert), dtype=bool)] -= min_dist_sbert  # Adjust non-diagonal elements
+    np.fill_diagonal(distances_sbert, 0.0)  # Ensure diagonal is exactly zero
+    
     condensed_distances_sbert = squareform(distances_sbert)
     linkage_matrix_sbert = linkage(condensed_distances_sbert, method='ward')
     
@@ -387,7 +397,7 @@ def save_selected_images(dataset, selected_indices, metadata, output_dir='select
 def main():
     # Load CIFAR-100 dataset first
     print("Loading CIFAR-100 dataset...")
-    dataset, class_names = load_cifar100()
+    dataset, class_names, class_to_idx, idx_to_class = load_cifar100()
     
     # Load features
     print("Loading features...")
