@@ -31,80 +31,42 @@ distance_matrix = 1 - similarity_matrix  # Convert to distance matrix
 
 ### Part 3: Hierarchical Clustering Analysis ###
 
-# Define linkage methods and their corresponding thresholds
-linkage_methods = {
-    'ward': {
-        'threshold': 0.3,
-        'description': 'Minimizes variance within clusters, creates compact clusters'
-    },
-    'complete': {
-        'threshold': 0.5,
-        'description': 'Uses maximum distances between points, creates evenly sized clusters'
-    },
-    'average': {
-        'threshold': 0.4,
-        'description': 'Uses mean distances, balances cluster characteristics'
-    },
-    'single': {
-        'threshold': 0.2,
-        'description': 'Uses minimum distances, can find elongated clusters'
-    }
-}
+# Get actual image filenames from the targets folder (assuming they're numbered .jpg files)
+image_labels = [f"{i}.jpg" for i in range(1, len(observation_vectors) + 1)]
 
-# Color palette for clusters
-colors = list(mcolors.TABLEAU_COLORS.values())
+# Compute linkage matrix using Ward's method
+linkage_matrix = linkage(scipy.spatial.distance.pdist(sbert_feature_vectors), method='ward')
 
-for method, params in linkage_methods.items():
-    # Compute linkage matrix
-    linkage_matrix = linkage(scipy.spatial.distance.pdist(sbert_feature_vectors), method=method)
-    
-    # Get clustering parameters
-    threshold = params['threshold']
-    max_distance = max(linkage_matrix[:, 2])
-    
-    print(f"\nMethod: {method}")
-    print(f"Description: {params['description']}")
-    print(f"Maximum distance: {max_distance:.4f}")
-    print(f"Threshold: {threshold}")
+# Create simple, clean dendrogram
+plt.figure(figsize=(12, 8))
+dendrogram(
+    linkage_matrix,
+    labels=image_labels,
+    leaf_rotation=0,  # Keep labels horizontal
+    leaf_font_size=10,  # Slightly smaller font
+)
+plt.title("Hierarchical Clustering Dendrogram (Threshold: 0.30)")
+plt.xlabel("")  # Remove x-axis label
+plt.ylabel("Distance")
 
-    # Create dendrogram with colored clusters
-    plt.figure(figsize=(12, 8))
-    
-    # Generate cluster colors
-    clusters = fcluster(linkage_matrix, threshold, criterion='distance')
-    unique_clusters = len(set(clusters))
-    cluster_colors = [colors[i % len(colors)] for i in range(unique_clusters)]
-    
-    # Plot dendrogram
-    dendrogram(
-        linkage_matrix,
-        labels=sbert_image_labels,
-        leaf_rotation=90,
-        leaf_font_size=12,
-        color_threshold=threshold,
-        above_threshold_color='grey',
-        link_color_func=lambda k: cluster_colors[clusters[k] - 1] if k < len(clusters) else 'grey'
-    )
-    
-    plt.title(f"Hierarchical Clustering Dendrogram\n({method.capitalize()} Linkage, Threshold: {threshold:.2f})")
-    plt.xlabel("Image Index")
-    plt.ylabel("Distance")
-    plt.axhline(y=threshold, color='r', linestyle='--', label=f'Threshold: {threshold:.2f}')
-    plt.legend()
-    plt.tight_layout()
-    plt.show()
+# Add threshold line
+plt.axhline(y=0.3, color='r', linestyle='--', label='Threshold: 0.30')
+plt.legend()
 
-    # Print cluster assignments
-    cluster_dict = {}
-    for idx, cluster_id in enumerate(clusters):
-        if cluster_id not in cluster_dict:
-            cluster_dict[cluster_id] = []
-        cluster_dict[cluster_id].append(sbert_image_labels[idx])
+plt.tight_layout()
+plt.show()
 
-    print(f"\nCluster Assignments ({method} linkage):")
-    for cluster_id, images in cluster_dict.items():
-        print(f"\nCluster {cluster_id} ({cluster_colors[(cluster_id-1) % len(colors)]}):")
-        print(", ".join(images))
+# Print cluster assignments
+cluster_dict = {}
+for idx, cluster_id in enumerate(clusters):
+    if cluster_id not in cluster_dict:
+        cluster_dict[cluster_id] = []
+    cluster_dict[cluster_id].append(sbert_image_labels[idx])
+
+print(f"\nCluster Assignments (Ward linkage):")
+for cluster_id, images in cluster_dict.items():
+    print(f"\nCluster {cluster_id}:")
+    print(", ".join(images))
 
 ### Part 4: Similarity Analysis ###
 
