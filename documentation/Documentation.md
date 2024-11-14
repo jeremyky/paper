@@ -143,9 +143,100 @@ The combined descriptor encoding approach was selected for implementation:
   5. Visualize results through dendrograms and heatmaps
 
 ### 3. CNN Analysis Implementation
-- Computer vision analysis of image features
-- Direct comparison of visual similarities between images
-- Clustering-based validation of image relationships
+
+#### Feature Processing and Similarity Analysis
+
+1. **Feature Vector Processing**
+   - Features extracted from last maxpool layer of AlexNet
+   - Each feature vector flattened to 1D array
+   - Features stored as individual .pt files for reusability
+   ```python
+   feature_vector = torch.load(feature_path).flatten().numpy()
+   ```
+
+2. **Similarity Computation**
+   - Direct cosine similarity calculation between feature vectors
+   - Chosen over correlation distance for better interpretability
+   - Range: [-1, 1] where:
+     - 1 indicates perfect similarity
+     - 0 indicates orthogonality
+     - -1 indicates opposite features
+   ```python
+   similarity_matrix = cosine_similarity(cnn_feature_vectors)
+   ```
+
+#### Visualization Implementation
+
+1. **Dendrogram Generation**
+   - Uses Ward's linkage method for hierarchical clustering
+   - Displays relationships between images based on visual features
+   - Horizontal layout for better label readability
+   - Parameters:
+     ```python
+     dendrogram(
+         linkage_matrix_ward_cnn,
+         labels=cnn_image_labels,
+         leaf_rotation=0,  
+         leaf_font_size=10
+     )
+     ```
+
+2. **Heatmap Visualization**
+   - Ordered to match dendrogram clustering
+   - Diagonal values masked to focus on inter-image relationships
+   - Color scaling:
+     - vmin=-1, vmax=1 for full cosine similarity range
+     - Centered at 0 for balanced visualization
+     - Uses coolwarm colormap for intuitive interpretation
+   - Parameters:
+     ```python
+     sns.heatmap(
+         ordered_similarity_matrix,
+         annot=True,
+         fmt='.2f',
+         mask=mask,
+         vmin=-1,
+         vmax=1,
+         center=0
+     )
+     ```
+
+#### Key Implementation Decisions
+
+1. **Similarity Metric Choice**
+   - Cosine similarity preferred over correlation distance
+   - Reasons:
+     - More interpretable range (-1 to 1)
+     - Standard in computer vision tasks
+     - Better at capturing visual feature relationships
+     - Scale-invariant comparison
+
+2. **Visualization Choices**
+   - Clean, minimal dendrogram design
+   - Masked diagonal in heatmap
+   - Two-decimal precision for similarity scores
+   - Removed axis labels for cleaner presentation
+
+3. **Data Organization**
+   - Consistent ordering between dendrogram and heatmap
+   - Image labels matched to actual filenames
+   - Hierarchical structure preserved in visualizations
+
+#### Analysis Benefits
+1. **Visual Feature Comparison**
+   - Direct comparison of image content
+   - No reliance on semantic descriptions
+   - Captures subtle visual similarities
+
+2. **Objective Measurement**
+   - Consistent feature extraction
+   - Standardized similarity computation
+   - Reproducible results
+
+3. **Complementary to SBERT Analysis**
+   - Provides visual perspective alongside semantic analysis
+   - Enables validation of semantic relationships
+   - Helps identify cases where visual and semantic similarities diverge
 
 ## Future Directions
 - Expansion of image dataset
@@ -310,3 +401,88 @@ This integrated approach best serves our remote viewing analysis by:
 - Showing hierarchical relationships
 - Quantifying similarities between descriptions
 - Supporting objective analysis of viewer accuracy
+
+### CNN Implementation Details
+
+#### AlexNet Architecture and Feature Extraction
+1. **Why AlexNet?**
+   - Proven architecture for image feature extraction
+   - Well-understood feature hierarchy
+   - Pre-trained on diverse ImageNet dataset
+   - Efficient computation and robust features
+   - Strong performance in transfer learning tasks
+
+2. **Hook Implementation for Feature Extraction**
+   ```python
+   class FeatureExtractor:
+       def __init__(self, model):
+           self.model = model
+           self.features = None
+           self.hook = model.features[12].register_forward_hook(self.hook_fn)
+   ```
+   - Hooks are PyTorch mechanisms that:
+     - Intercept intermediate layer outputs
+     - Allow access to feature maps without modifying model
+     - Enable extraction of specific layer representations
+   - Layer 12 (last maxpool) chosen because:
+     - Contains high-level semantic features
+     - Balances abstraction and detail
+     - Provides compact representation
+
+3. **Feature Processing Pipeline**
+   ```python
+   preprocess = transforms.Compose([
+       transforms.Resize(256),
+       transforms.CenterCrop(224),
+       transforms.ToTensor(),
+       transforms.Normalize(mean=[0.485, 0.456, 0.406], 
+                          std=[0.229, 0.224, 0.225])
+   ])
+   ```
+   - Standardize image sizes
+   - Apply ImageNet normalization
+   - Convert to tensor format
+   - Ensure consistent processing
+
+#### Dual Heatmap Visualization Strategy
+
+1. **Raw Similarity Heatmap**
+   - Shows unmodified cosine similarity values
+   - Range: [-1, 1]
+   - Centered at 0
+   - Advantages:
+     - Preserves actual similarity measures
+     - Shows true relationship strengths
+   - Limitations:
+     - May be hard to visually interpret
+     - Subtle differences less apparent
+
+2. **Interpolated Similarity Heatmap**
+   ```python
+   min_val = ordered_similarity_matrix[~mask].min()
+   max_val = ordered_similarity_matrix[~mask].max()
+   interpolated_matrix = (ordered_similarity_matrix - min_val) / (max_val - min_val)
+   ```
+   - Rescales values to [0, 1] range
+   - Based on actual data range
+   - Benefits:
+     - Enhanced visual contrast
+     - Easier pattern recognition
+     - Better group identification
+   - Implementation:
+     - Masks diagonal values
+     - Preserves relative relationships
+     - Shows original values in annotations
+
+3. **Visualization Parameters**
+   - Side-by-side display for comparison
+   - Consistent ordering with dendrogram
+   - Masked diagonal entries
+   - Coolwarm colormap for intuitive interpretation
+   - Annotations show original values
+
+4. **Analysis Benefits**
+   - Complementary views of similarity structure
+   - Balance between accuracy and interpretability
+   - Facilitates pattern discovery
+   - Supports both detailed and overview analysis
