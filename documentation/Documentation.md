@@ -195,71 +195,118 @@ The improved implementation includes:
 - Multiple clustering method options
 - Enhanced validation capabilities for remote viewing matches
 
-### Hierarchical Clustering Implementation
+### Clustering and Visualization Implementation Decisions
 
-#### Linkage Methods Analysis
-Four different linkage methods were implemented and compared for semantic clustering:
+#### Hierarchical Clustering Method Selection
 
-1. **Ward Linkage**
-   - *Threshold*: 0.3
+We evaluated several hierarchical clustering approaches before selecting Ward's method:
+
+1. **Single Linkage**
+   - *Method*: Measures distance between closest points of clusters
    - *Characteristics*:
-     - Minimizes variance within clusters
-     - Creates compact, balanced clusters
-     - Best for finding groups of descriptions with similar semantic content
-     - Useful when descriptions should form distinct, well-separated groups
-   - *Application*: Ideal for identifying major thematic groups in image descriptions
+     - Creates long, chain-like clusters
+     - Sensitive to noise and outliers
+     - Good at finding elongated clusters
+   - *Why Not Chosen*: 
+     - Too sensitive for semantic analysis
+     - Creates unbalanced clusters
+     - Doesn't reflect natural semantic groupings
 
 2. **Complete Linkage**
-   - *Threshold*: 0.5
+   - *Method*: Uses maximum distance between points in clusters
    - *Characteristics*:
-     - Uses maximum distances between points
-     - Creates evenly sized clusters
-     - Conservative in forming clusters
-     - Sensitive to outliers in descriptions
-   - *Application*: Helpful for finding highly distinct semantic groups
+     - Creates compact, spherical clusters
+     - Less sensitive to outliers
+     - Tends to break large clusters
+   - *Why Not Chosen*:
+     - Too conservative for semantic relationships
+     - May miss subtle semantic connections
+     - Can create artificially small clusters
 
 3. **Average Linkage**
-   - *Threshold*: 0.4
+   - *Method*: Uses mean distance between all pairs
    - *Characteristics*:
-     - Uses mean distances between all pairs
-     - Balances cluster characteristics
-     - More robust to description variations
-     - Provides middle-ground between single and complete linkage
-   - *Application*: Good for general-purpose semantic clustering
+     - Compromise between single and complete
+     - Moderately robust to outliers
+     - Creates medium-sized clusters
+   - *Why Not Chosen*:
+     - Lacks clear theoretical justification for semantic data
+     - Doesn't consider variance within clusters
+     - Can be inconsistent with semantic relationships
 
-4. **Single Linkage**
-   - *Threshold*: 0.2
+4. **Ward's Method** (Chosen Approach)
+   - *Method*: Minimizes variance within clusters
    - *Characteristics*:
-     - Uses minimum distances between pairs
-     - Can find elongated clusters
-     - Sensitive to semantic bridges between clusters
-     - May create chain-like clusters
-   - *Application*: Useful for finding gradual semantic transitions
+     - Creates compact, well-defined clusters
+     - Considers cluster structure holistically
+     - Tends to create balanced clusters
+   - *Why Chosen*:
+     - Best reflects semantic relationships
+     - Creates interpretable groupings
+     - Maintains cluster cohesion
+     - Ideal for semantic embedding spaces
 
-#### Visualization Enhancements
-- **Color Coding**:
-  - Distinct colors for each cluster
-  - Grey for connections above threshold
-  - Helps visualize cluster boundaries
-  - Makes relationship patterns more apparent
+#### Dendrogram Implementation
 
-- **Threshold Visualization**:
-  - Horizontal red line showing cut-off point
-  - Helps interpret cluster formation
-  - Allows for consistent cluster identification
+Several visualization options were considered:
 
-#### Cluster Analysis Output
-For each linkage method:
-- Detailed cluster assignments
-- Color-coded groupings
-- Similarity scores within clusters
-- Inter-cluster relationships
+1. **Color-Coded by Height**
+   - Shows different levels of hierarchy in different colors
+   - *Why Not Chosen*: 
+     - Too visually complex
+     - Distracts from core relationships
 
-#### Selection Criteria for Remote Viewing Analysis
-The optimal linkage method should:
-1. Create semantically meaningful clusters
-2. Maintain distinction between different description types
-3. Be robust to variations in description style
-4. Provide consistent clustering across similar descriptions
+2. **Multiple Threshold Lines**
+   - Shows different possible clustering levels
+   - *Why Not Chosen*:
+     - Clutters visualization
+     - Complicates interpretation
 
-Based on these criteria, [preferred method] linkage was selected as the primary clustering method because [reasoning].
+3. **Simple Structure with Single Threshold** (Chosen Approach)
+   - Clean visualization
+   - Single red threshold line
+   - Clear branch structure
+   - *Why Chosen*:
+     - Maximizes interpretability
+     - Focuses on key relationships
+     - Matches semantic analysis needs
+
+#### Heatmap Implementation
+
+Considered various approaches for similarity visualization:
+
+1. **Full Matrix with Diagonal**
+   - Shows all similarities including self-similarity
+   - *Why Not Chosen*:
+     - Diagonal values dominate color scale
+     - Reduces contrast for important comparisons
+
+2. **Binary Threshold Visualization**
+   - Shows only similarities above threshold
+   - *Why Not Chosen*:
+     - Loses granular relationship information
+     - Too simplistic for semantic analysis
+
+3. **Masked Diagonal with Normalized Scale** (Chosen Approach)
+   - Hides diagonal values
+   - Uses centered color scale
+   - Shows full range of similarities
+   - *Why Chosen*:
+     - Focuses on inter-image relationships
+     - Maximizes visual contrast
+     - Preserves all relevant information
+     - Easier to interpret semantic relationships
+
+#### Integration of Methods
+
+The combination of Ward's clustering, simple dendrogram, and masked heatmap provides:
+1. Robust semantic clustering
+2. Clear visualization of relationships
+3. Detailed similarity information
+4. Balance between detail and interpretability
+
+This integrated approach best serves our remote viewing analysis by:
+- Identifying meaningful semantic groups
+- Showing hierarchical relationships
+- Quantifying similarities between descriptions
+- Supporting objective analysis of viewer accuracy

@@ -37,6 +37,9 @@ image_labels = [f"{i}.jpg" for i in range(1, len(observation_vectors) + 1)]
 # Compute linkage matrix using Ward's method
 linkage_matrix = linkage(scipy.spatial.distance.pdist(sbert_feature_vectors), method='ward')
 
+# Define threshold
+threshold = 0.3
+
 # Create simple, clean dendrogram
 plt.figure(figsize=(12, 8))
 dendrogram(
@@ -50,18 +53,21 @@ plt.xlabel("")  # Remove x-axis label
 plt.ylabel("Distance")
 
 # Add threshold line
-plt.axhline(y=0.3, color='r', linestyle='--', label='Threshold: 0.30')
+plt.axhline(y=threshold, color='r', linestyle='--', label=f'Threshold: {threshold:.2f}')
 plt.legend()
 
 plt.tight_layout()
 plt.show()
+
+# Get cluster assignments
+clusters = fcluster(linkage_matrix, threshold, criterion='distance')
 
 # Print cluster assignments
 cluster_dict = {}
 for idx, cluster_id in enumerate(clusters):
     if cluster_id not in cluster_dict:
         cluster_dict[cluster_id] = []
-    cluster_dict[cluster_id].append(sbert_image_labels[idx])
+    cluster_dict[cluster_id].append(image_labels[idx])  # Use image_labels instead of sbert_image_labels
 
 print(f"\nCluster Assignments (Ward linkage):")
 for cluster_id, images in cluster_dict.items():
@@ -70,11 +76,13 @@ for cluster_id, images in cluster_dict.items():
 
 ### Part 4: Similarity Analysis ###
 
-# Create heatmap using the best linkage method's ordering
-final_linkage = linkage(scipy.spatial.distance.pdist(sbert_feature_vectors), method='average')
-ordered_indices = leaves_list(final_linkage)
+# Create heatmap using the same ordering as dendrogram
+ordered_indices = leaves_list(linkage_matrix)  # Use the same linkage matrix as dendrogram
 ordered_similarity_matrix = similarity_matrix[ordered_indices][:, ordered_indices]
-ordered_labels = [sbert_image_labels[i] for i in ordered_indices]
+ordered_labels = [image_labels[i] for i in ordered_indices]  # Use image_labels to match dendrogram
+
+# Create mask for diagonal
+mask = np.eye(len(ordered_similarity_matrix), dtype=bool)
 
 plt.figure(figsize=(10, 8))
 sns.heatmap(
@@ -82,29 +90,33 @@ sns.heatmap(
     annot=True,
     cmap='coolwarm',
     xticklabels=ordered_labels,
-    yticklabels=ordered_labels
+    yticklabels=ordered_labels,
+    mask=mask,  # Mask the diagonal
+    vmin=0,     # Set minimum value for color scale
+    vmax=1,     # Set maximum value for color scale
+    center=0.5  # Center the colormap
 )
 plt.title("Cosine Similarity Heatmap (SBERT Features)")
-plt.xlabel("Image Index")
-plt.ylabel("Image Index")
+plt.xlabel("")
+plt.ylabel("")
 plt.tight_layout()
 plt.show()
 
 ### Part 5: Top Pairs Analysis ###
 
 # Find most similar pairs
-top_n = 5
-flattened_similarity = []
-for i in range(len(ordered_similarity_matrix)):
-    for j in range(i+1, len(ordered_similarity_matrix)):
-        flattened_similarity.append((ordered_similarity_matrix[i, j], i, j))
+# top_n = 5
+# flattened_similarity = []
+# for i in range(len(ordered_similarity_matrix)):
+#     for j in range(i+1, len(ordered_similarity_matrix)):
+#         flattened_similarity.append((ordered_similarity_matrix[i, j], i, j))
 
-# Display top similar pairs
-flattened_similarity.sort(reverse=True, key=lambda x: x[0])
-print(f"\nTop {top_n} most related observation vectors:\n")
-for score, i, j in flattened_similarity[:top_n]:
-    print(f"Similarity: {score:.4f}")
-    print(f"Image {ordered_labels[i]} and Image {ordered_labels[j]}:")
-    print(f" - {observation_vectors[ordered_indices[i]]}")
-    print(f" - {observation_vectors[ordered_indices[j]]}")
-    print()
+# # Display top similar pairs
+# flattened_similarity.sort(reverse=True, key=lambda x: x[0])
+# print(f"\nTop {top_n} most related observation vectors:\n")
+# for score, i, j in flattened_similarity[:top_n]:
+#     print(f"Similarity: {score:.4f}")
+#     print(f"Image {ordered_labels[i]} and Image {ordered_labels[j]}:")
+#     print(f" - {observation_vectors[ordered_indices[i]]}")
+#     print(f" - {observation_vectors[ordered_indices[j]]}")
+#     print()
