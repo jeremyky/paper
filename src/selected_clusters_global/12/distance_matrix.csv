@@ -1,0 +1,7 @@
+Distance Matrix (Cosine Similarity):
+
+,Akangarooandb,Acatstatue3,Amountaingoa2,AAFRICS13
+Akangarooandb,1.000,0.400,0.461,0.416
+Acatstatue3,0.400,1.000,0.416,0.468
+Amountaingoa2,0.461,0.416,1.000,0.368
+AAFRICS13,0.416,0.468,0.368,1.000

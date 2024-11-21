@@ -1,0 +1,7 @@
+Distance Matrix (Cosine Similarity):
+
+,ALAMP45,Adecorativem2,ASPOTLIG2,26431471.thl
+ALAMP45,1.000,0.526,0.423,0.530
+Adecorativem2,0.526,1.000,0.405,0.545
+ASPOTLIG2,0.423,0.405,1.000,0.458
+26431471.thl,0.530,0.545,0.458,1.000

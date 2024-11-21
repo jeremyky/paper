@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,hulahoop,Aflower103,Ahulahoop2,Abikinitop5,wetsuit1
+hulahoop,1.000,0.171,0.358,0.309,0.259
+Aflower103,0.171,1.000,0.167,0.215,0.323
+Ahulahoop2,0.358,0.167,1.000,0.456,0.230
+Abikinitop5,0.309,0.215,0.456,1.000,0.238
+wetsuit1,0.259,0.323,0.230,0.238,1.000
