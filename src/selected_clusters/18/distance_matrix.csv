@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,30835757.thl,Acarrot,ABISHOP2,26375953.thl,Amountaingoa2
+30835757.thl,1.000,0.178,0.248,0.213,0.346
+Acarrot,0.178,1.000,0.166,0.318,0.166
+ABISHOP2,0.248,0.166,1.000,0.171,0.289
+26375953.thl,0.213,0.318,0.171,1.000,0.158
+Amountaingoa2,0.346,0.166,0.289,0.158,1.000

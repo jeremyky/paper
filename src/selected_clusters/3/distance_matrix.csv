@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,hulahoop,Aelectronicor,ACOUPLEF2,Aflowerpot15,ABROCHETT
+hulahoop,1.000,0.076,0.093,0.132,0.138
+Aelectronicor,0.076,1.000,0.073,0.103,0.069
+ACOUPLEF2,0.093,0.073,1.000,0.115,0.170
+Aflowerpot15,0.132,0.103,0.115,1.000,0.116
+ABROCHETT,0.138,0.069,0.170,0.116,1.000

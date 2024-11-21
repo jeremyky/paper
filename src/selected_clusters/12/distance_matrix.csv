@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,Aclimbersicep,wok,Achocolateice,Aashtray14,Aflower103
+Aclimbersicep,1.000,0.121,0.160,0.179,0.247
+wok,0.121,1.000,0.182,0.241,0.154
+Achocolateice,0.160,0.182,1.000,0.153,0.178
+Aashtray14,0.179,0.241,0.153,1.000,0.217
+Aflower103,0.247,0.154,0.178,0.217,1.000

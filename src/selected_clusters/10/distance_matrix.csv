@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,hotgreenpepper,ALAMP45,8255030.thl,wetsuit1,ADOGTOY5
+hotgreenpepper,1.000,0.102,0.240,0.150,0.274
+ALAMP45,0.102,1.000,0.125,0.256,0.128
+8255030.thl,0.240,0.125,1.000,0.140,0.208
+wetsuit1,0.150,0.256,0.140,1.000,0.158
+ADOGTOY5,0.274,0.128,0.208,0.158,1.000
