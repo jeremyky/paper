@@ -109,6 +109,12 @@ def average_min_distance(features):
     pairwise_dist = pdist(features, metric='cosine')
     return np.mean(pairwise_dist)
 
+
+def find_min_distance_amongst_100(features):
+    # Compute pairwise cosine distances
+    pairwise_dist = pdist(features, metric='cosine')
+    return np.min(pairwise_dist)
+
 # Calculate average minimum distance for clustered selection
 clustered_avg_distance = average_min_distance(selected_features)
 
@@ -116,19 +122,39 @@ clustered_avg_distance = average_min_distance(selected_features)
 print("Running Monte Carlo simulation...")
 num_simulations = 1000
 random_avg_distances = []
+random_min_distances = []
 for i in range(num_simulations):
     rand_indices = random.sample(range(len(cnn_feature_vectors)), 100)
     rand_features = cnn_feature_vectors[rand_indices]
     rand_avg = average_min_distance(rand_features)
     random_avg_distances.append(rand_avg)
+    rand_min = find_min_distance_amongst_100(rand_features)
+    random_min_distances.append(rand_min)
     if (i+1) % 100 == 0:
+        print("Mean dist of random: " + str(np.mean(random_avg_distances)))
+        print("Min dist of random: " + str(np.min(random_avg_distances)))
+        print("Max dist of random: " + str(np.max(random_avg_distances)))
+        print("RANDOM Min dist amongst 100: " + str(find_min_distance_amongst_100(rand_features)))
         print(f"Completed {i+1}/{num_simulations} simulations")
 
 random_avg_distances = np.array(random_avg_distances)
-
+random_min_distances = np.array(random_min_distances)
 # Calculate p-value
-p_value = np.mean(random_avg_distances >= clustered_avg_distance)
-print(f"\nFinal P-value: {p_value:.4f}")
+print("Clust Avg of mine: " + str(clustered_avg_distance))
+print("ALGORITHM Min dist amongst 100 : " + str(find_min_distance_amongst_100(selected_features)))
+print("# of Random  greater than the algorithm")
+print(np.sum(random_avg_distances >= clustered_avg_distance))
+p_value = (np.sum(random_avg_distances >= clustered_avg_distance)) / num_simulations
+print(f"\nFinal P-value: {p_value:.10f}")
+
+random_min_greater_than_algorithm = np.sum(random_min_distances >= find_min_distance_amongst_100(selected_features))
+print("# of Random Min dist greater than the algorithm")
+print(random_min_greater_than_algorithm)
+print("Average of Random Min that are closest to eachother")
+print(np.mean(random_min_distances))
+# p_value_min = random_min_greater_than_algorithm / num_simulations
+# print(f"\nFinal P-value Min: {p_value_min:.10f}")
+
 
 ### Part 5: Cluster the 100 Selected Images into 20 Sub-clusters of 5 ###
 

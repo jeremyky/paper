@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,26427111.thl,Acarrot,AEAREXAM2,wetsuit1,Adecorativem2
+26427111.thl,1.000,0.218,0.238,0.295,0.324
+Acarrot,0.218,1.000,0.125,0.190,0.140
+AEAREXAM2,0.238,0.125,1.000,0.297,0.299
+wetsuit1,0.295,0.190,0.297,1.000,0.248
+Adecorativem2,0.324,0.140,0.299,0.248,1.000

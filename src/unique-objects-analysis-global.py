@@ -70,40 +70,76 @@ selected_labels = [cnn_image_labels[i] for i in selected_indices]
 selected_features = cnn_feature_vectors[selected_indices]
 
 ### Part 3: Global Clustering Approach ###
-def global_clustering(features, num_clusters=20):
-    # First use hierarchical clustering to get global structure
-    hierarchical = AgglomerativeClustering(n_clusters=num_clusters)
+def global_clustering(features, num_clusters=20, images_per_cluster=5):
+    # First use hierarchical clustering to get rough groups
+    initial_clusters = 40  # Start with even more clusters for finer granularity
+    hierarchical = AgglomerativeClustering(n_clusters=initial_clusters)
     cluster_labels = hierarchical.fit_predict(features)
     
-    # Create clusters dictionary
-    clusters = {i: [] for i in range(num_clusters)}
+    # Create initial clusters dictionary
+    initial_groups = {i: [] for i in range(initial_clusters)}
     
-    # Assign indices to clusters
+    # Assign indices to initial groups
     for idx, label in enumerate(cluster_labels):
-        clusters[label].append(idx)
+        initial_groups[label].append(idx)
     
-    # For each cluster, ensure internal diversity
+    # Create final clusters ensuring maximum diversity
     final_clusters = {}
-    cluster_counter = 0
+    used_indices = set()
     
-    for cluster_id in clusters:
-        if len(clusters[cluster_id]) >= 5:
-            # If cluster has more than 5 images, select most diverse 5
-            cluster_features = features[clusters[cluster_id]]
-            diverse_indices = select_most_diverse(cluster_features, num_select=5)
-            final_clusters[cluster_counter] = [clusters[cluster_id][i] for i in diverse_indices]
-            cluster_counter += 1
-        elif len(clusters[cluster_id]) >= 2:  # Only keep clusters with 2 or more images
-            print(f"Note: Cluster {cluster_id} has {len(clusters[cluster_id])} images")
-            final_clusters[cluster_counter] = clusters[cluster_id]
-            cluster_counter += 1
+    # For each new cluster we want to form
+    for cluster_id in range(num_clusters):
+        cluster_indices = []
+        available_indices = set(range(len(features))) - used_indices
+        
+        # Select first image for this cluster
+        # Choose from images that are most different from all previously used images
+        if used_indices:
+            used_features = features[list(used_indices)]
+            available_features = features[list(available_indices)]
+            similarities = cosine_similarity(available_features, used_features)
+            max_similarities = similarities.max(axis=1)  # Maximum similarity to any used image
+            start_idx = list(available_indices)[np.argmin(max_similarities)]
         else:
-            print(f"Skipping cluster {cluster_id} with only {len(clusters[cluster_id])} images")
+            # For first cluster, start randomly
+            start_idx = random.choice(list(available_indices))
+            
+        cluster_indices.append(start_idx)
+        used_indices.add(start_idx)
+        available_indices.remove(start_idx)
+        
+        # Add 4 more images to this cluster
+        while len(cluster_indices) < images_per_cluster:
+            # Get features for current cluster and all used images
+            cluster_features = features[cluster_indices]
+            used_features = features[list(used_indices)]
+            available_features = features[list(available_indices)]
+            
+            # Calculate similarities to both cluster and all used images
+            cluster_similarities = cosine_similarity(available_features, cluster_features)
+            used_similarities = cosine_similarity(available_features, used_features)
+            
+            # Combine both criteria
+            cluster_max_sim = cluster_similarities.max(axis=1)  # Max similarity to cluster
+            used_max_sim = used_similarities.max(axis=1)  # Max similarity to used images
+            
+            # Weight both factors (adjust weights if needed)
+            combined_score = 0.7 * cluster_max_sim + 0.3 * used_max_sim
+            
+            # Select image with lowest combined score
+            next_idx = list(available_indices)[np.argmin(combined_score)]
+            cluster_indices.append(next_idx)
+            used_indices.add(next_idx)
+            available_indices.remove(next_idx)
+        
+        final_clusters[cluster_id] = cluster_indices
+        print(f"Formed cluster {cluster_id + 1} with {len(cluster_indices)} images")
     
     return final_clusters
 
-print("Performing global clustering...")
-clusters = global_clustering(selected_features)
+print("Performing global clustering with enhanced diversity...")
+clusters = global_clustering(selected_features, num_clusters=20, images_per_cluster=5)
+print(f"Created {len(clusters)} clusters with 5 images each")
 
 ### Part 4: Visualization and Analysis ###
 os.makedirs(output_base_dir, exist_ok=True)

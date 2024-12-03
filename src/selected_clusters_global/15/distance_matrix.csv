@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,Agirltrainin3,8055554.thl,22859796.thl,ADOGTOY5,Acucumber2
+Agirltrainin3,1.000,0.179,0.214,0.168,0.159
+8055554.thl,0.179,1.000,0.194,0.268,0.280
+22859796.thl,0.214,0.194,1.000,0.135,0.121
+ADOGTOY5,0.168,0.268,0.135,1.000,0.262
+Acucumber2,0.159,0.280,0.121,0.262,1.000
