@@ -54,141 +54,123 @@ def create_clusters(features, n_clusters=20, images_per_cluster=5):
 ## Example Clusters
 
 ### Cluster 0 (First Cluster)
-This cluster demonstrates the initial grouping:
-
 ![Cluster Analysis](../assets/example_outputs/cluster_analysis/cluster_0/cluster_analysis.png)
 
-**Individual Images (numbered according to dendrogram/heatmap):**
+**Individual Images:**
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_0/image_0_Aornamentalt5.jpg" width="19%" />
-    <figcaption>Image 0 - Corresponds to index 0 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 0</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_0/image_1_Aleopard19.jpg" width="19%" />
-    <figcaption>Image 1 - Corresponds to index 1 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 1</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_0/image_2_Alobster10.jpg" width="19%" />
-    <figcaption>Image 2 - Corresponds to index 2 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 2</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_0/image_3_AROCKET11.jpg" width="19%" />
-    <figcaption>Image 3 - Corresponds to index 3 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 3</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_0/image_4_Abird41.jpg" width="19%" />
-    <figcaption>Image 4 - Corresponds to index 4 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 4</figcaption>
 </figure>
 
-**Cluster Statistics:**
-- Mean Internal Distance: 0.723
-- Minimum Distance: 0.512
-- Maximum Distance: 0.891
-
 ### Cluster 5 (Middle Cluster)
-A representative cluster from the middle of our analysis:
-
 ![Cluster Analysis](../assets/example_outputs/cluster_analysis/cluster_5/cluster_analysis.png)
 
-**Individual Images (numbered according to dendrogram/heatmap):**
+**Individual Images:**
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_5/image_0_ARELSCU49.jpg" width="19%" />
-    <figcaption>Image 0 - Corresponds to index 0 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 0</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_5/image_1_ABUDDHA18.jpg" width="19%" />
-    <figcaption>Image 1 - Corresponds to index 1 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 1</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_5/image_2_DSCN9735-sm.jpg" width="19%" />
-    <figcaption>Image 2 - Corresponds to index 2 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 2</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_5/image_3_Abat5.jpg" width="19%" />
-    <figcaption>Image 3 - Corresponds to index 3 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 3</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_5/image_4_AAFRICS13.jpg" width="19%" />
-    <figcaption>Image 4 - Corresponds to index 4 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 4</figcaption>
 </figure>
 
-**Cluster Statistics:**
-- Mean Internal Distance: 0.689
-- Minimum Distance: 0.498
-- Maximum Distance: 0.856
-
 ### Cluster 14 (Representative Cluster)
-A cluster showing electronic items:
-
 ![Cluster Analysis](../assets/example_outputs/cluster_analysis/cluster_14/cluster_analysis.png)
 
-**Individual Images (numbered according to dendrogram/heatmap):**
+**Individual Images:**
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_14/image_0_Aelectronicor.jpg" width="19%" />
-    <figcaption>Image 0 - Corresponds to index 0 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 0</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_14/image_1_26374709.thl.jpg" width="19%" />
-    <figcaption>Image 1 - Corresponds to index 1 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 1</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_14/image_2_26377777.thl.jpg" width="19%" />
-    <figcaption>Image 2 - Corresponds to index 2 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 2</figcaption>
 </figure>
 
 <figure>
-    <img src="../assets/example_outputs/cluster_analysis/cluster_14/image_3_Aelectricgrl3.jpg" width="19%" />
-    <figcaption>Image 3 - Corresponds to index 3 in dendrogram/heatmap</figcaption>
+    <img src="../assets/example_outputs/cluster_analysis/cluster_14/image_3_Aelectricgri3.jpg" width="19%" />
+    <figcaption>Image 3</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_14/image_4_AWASHOPEN.jpg" width="19%" />
-    <figcaption>Image 4 - Corresponds to index 4 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 4</figcaption>
 </figure>
 
 ### Cluster 19 (Final Cluster)
-The last cluster showing different characteristics:
-
 ![Cluster Analysis](../assets/example_outputs/cluster_analysis/cluster_19/cluster_analysis.png)
 
-**Individual Images (numbered according to dendrogram/heatmap):**
+**Individual Images:**
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_19/image_0_Acookiejar14.jpg" width="19%" />
-    <figcaption>Image 0 - Corresponds to index 0 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 0</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_19/image_1_Atoytaxi3.jpg" width="19%" />
-    <figcaption>Image 1 - Corresponds to index 1 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 1</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_19/image_2_26421538.thl.jpg" width="19%" />
-    <figcaption>Image 2 - Corresponds to index 2 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 2</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_19/image_3_26379647.thl.jpg" width="19%" />
-    <figcaption>Image 3 - Corresponds to index 3 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 3</figcaption>
 </figure>
 
 <figure>
     <img src="../assets/example_outputs/cluster_analysis/cluster_19/image_4_AMICRO67.jpg" width="19%" />
-    <figcaption>Image 4 - Corresponds to index 4 in dendrogram/heatmap</figcaption>
+    <figcaption>Image 4</figcaption>
 </figure>
 
 ## Statistical Analysis
