@@ -12,60 +12,123 @@ The pipeline uses multiple approaches to understand image content:
    - Extracts visual features like shapes, textures, and patterns
    - Final layer features (2048-dimensional vectors)
 
-2. **SBERT Semantic Features**
+2. **SBERT Semantic Features** (Planned)
    - Sentence-BERT model for image caption analysis
-   - Captures semantic meaning and context
+   - Will capture semantic meaning and context
    - Uses CLIP model to generate image descriptions
    - 768-dimensional semantic embeddings
 
-### Image Selection Algorithms
+### Image Selection Process
 
-Available algorithms for selecting diverse images:
+1. **Initial Selection (110 Images)**
+   - Selects slightly more images than needed
+   - Uses distance metrics to maximize diversity
+   - Allows for removal of non-interpretable images
+
+2. **Interpretability Filtering**
+   - Removes ~10 non-interpretable images
+   - Criteria:
+     - Image clarity
+     - Object recognizability
+     - Visual distinctiveness
+
+3. **Final Selection (100 Images)**
+   - Maintains maximum diversity
+   - Ensures all images are interpretable
+   - Balances diversity with quality
+
+### Selection Algorithms
 
 1. **MaxMin Sequential**
-   - Greedy selection maximizing minimum distance
-   - Good for maintaining diversity
-   - Fast but potentially suboptimal
    ```python
    CLUSTERING_ALGORITHM = "maxmin_sequential"
+   SELECTION_CONFIG = {
+       "initial_selection": 110,
+       "final_selection": 100,
+       "interpretability_threshold": 0.8,
+       "distance_metric": "cosine"
+   }
    ```
+   - Greedy selection maximizing minimum distance
+   - Sequential selection with diversity optimization
+   - Validates against random selection
 
 2. **Global Average**
-   - Optimizes average pairwise distance
-   - More thorough but computationally intensive
-   - Better for overall distribution
-   ```python
-   CLUSTERING_ALGORITHM = "global_average"
-   ```
+   - Optimizes overall distribution
+   - Computationally more intensive
+   - Better for final refinement
 
 3. **Hybrid Clustering**
    - Combines MaxMin and Global approaches
-   - Balances speed and quality
    - Default recommended option
-   ```python
-   CLUSTERING_ALGORITHM = "hybrid_clustering"
-   ```
+   - Best balance of speed and quality
 
 ### Clustering Methods
 
-Options for grouping similar images:
-
 1. **Agglomerative Clustering**
-   - Hierarchical bottom-up clustering
-   - Creates dendrograms for visualization
-   - Parameters configurable in `experiment_config.py`:
+   - Creates 20 clusters of 5 images each
+   - Maximizes within-cluster diversity
+   - Parameters:
    ```python
    CLUSTERING_CONFIG = {
        "n_clusters": 20,
-       "linkage": "ward",  # Options: ward, complete, average
-       "distance_threshold": None
+       "linkage": "ward",
+       "distance_threshold": None,
+       "diversity_weight": 0.7  # Weights diversity vs. coherence
    }
    ```
 
-2. **Distance-based Grouping**
-   - Groups images based on similarity thresholds
-   - Automatically determines number of clusters
-   - Configurable distance metrics
+## Validation Metrics
+
+### Distance Analysis
+- Minimum distances between images (algorithm vs. random)
+- Mean distances within clusters
+- Distribution of distances across all pairs
+- Sequential vs. random performance comparison
+
+### Cluster Quality Metrics
+- Within-cluster diversity scores
+- Between-cluster separation
+- Temporal analysis (early vs. late clusters)
+- Cluster stability measures
+
+### Statistical Validation
+```
+=== Analysis Metrics Summary ===
+
+Monte Carlo Simulation Results:
+--------------------------------------------------
+Number of Simulations: 1000
+Algorithm Performance:
+  Mean Distance: 0.7523
+  Min Distance: 0.5234
+  Max Distance: 0.8901
+  
+Random Selection Stats:
+  Mean: 0.6891 ± 0.0234
+  Min: 0.6234
+  Max: 0.7456
+  
+Significance:
+  P-value: 0.001
+  Effect Size: 0.842
+```
+
+### Visualization Outputs
+1. **Distance Distribution Plots**
+   - Algorithm vs. random selection
+   - Within-cluster distances
+   - Between-cluster distances
+
+2. **Cluster Quality Plots**
+   - Mean distances per cluster
+   - Temporal cluster quality
+   - Diversity distribution
+
+3. **Validation Plots**
+   - Monte Carlo simulation results
+   - Statistical significance
+   - Performance benchmarks
 
 ## Pipeline Workflow
 
