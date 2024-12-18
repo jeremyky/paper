@@ -6,6 +6,7 @@ import logging
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_ind
+from matplotlib.colors import LinearSegmentedColormap
 
 logger = logging.getLogger(__name__)
 
@@ -170,6 +171,106 @@ def plot_minimum_distances(min_dist_analysis, output_dir):
     plt.savefig(os.path.join(metrics_dir, 'minimum_distances.png'))
     plt.close()
 
+def plot_distance_matrix(features, output_dir, max_display=100):
+    """Plot distance matrix heatmap for features"""
+    metrics_dir = os.path.join(output_dir, 'distance_analysis')
+    os.makedirs(metrics_dir, exist_ok=True)
+    
+    # If too many features, sample randomly
+    if len(features) > max_display:
+        indices = np.random.choice(len(features), max_display, replace=False)
+        features_subset = features[indices]
+    else:
+        features_subset = features
+    
+    # Calculate distance matrix
+    distances = 1 - cosine_similarity(features_subset)
+    
+    # Create custom colormap
+    colors = ['#FFF7EC', '#FEE8C8', '#FDD49E', '#FDBB84', '#FC8D59', 
+              '#EF6548', '#D7301F', '#B30000', '#7F0000']
+    cmap = LinearSegmentedColormap.from_list('custom', colors)
+    
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(distances, 
+                cmap=cmap,
+                xticklabels=False, 
+                yticklabels=False)
+    plt.title('Distance Matrix Heatmap\n(Cosine Distance)')
+    plt.xlabel('Images')
+    plt.ylabel('Images')
+    
+    # Add colorbar label
+    plt.colorbar(label='Distance')
+    
+    plt.tight_layout()
+    plt.savefig(os.path.join(metrics_dir, 'distance_matrix.png'), dpi=300)
+    plt.close()
+
+def plot_cluster_analysis(clusters, features, output_dir):
+    """Create comprehensive cluster analysis visualizations"""
+    metrics_dir = os.path.join(output_dir, 'cluster_analysis')
+    os.makedirs(metrics_dir, exist_ok=True)
+    
+    # 1. Cluster Size Distribution
+    plt.figure(figsize=(10, 6))
+    sizes = [len(indices) for indices in clusters.values()]
+    sns.histplot(sizes, bins=range(min(sizes), max(sizes) + 2, 1))
+    plt.title('Cluster Size Distribution')
+    plt.xlabel('Number of Images in Cluster')
+    plt.ylabel('Count')
+    plt.grid(True, alpha=0.3)
+    plt.savefig(os.path.join(metrics_dir, 'cluster_sizes.png'))
+    plt.close()
+    
+    # 2. Inter-cluster Distances
+    centroids = []
+    cluster_ids = []
+    for cluster_id, indices in clusters.items():
+        centroid = np.mean(features[indices], axis=0)
+        centroids.append(centroid)
+        cluster_ids.append(cluster_id)
+    
+    centroid_distances = 1 - cosine_similarity(centroids)
+    
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(centroid_distances,
+                cmap='viridis',
+                xticklabels=cluster_ids,
+                yticklabels=cluster_ids,
+                annot=True,
+                fmt='.2f',
+                square=True)
+    plt.title('Inter-cluster Distance Matrix\n(Cosine Distance between Centroids)')
+    plt.xlabel('Cluster ID')
+    plt.ylabel('Cluster ID')
+    plt.tight_layout()
+    plt.savefig(os.path.join(metrics_dir, 'intercluster_distances.png'))
+    plt.close()
+    
+    # 3. Intra-cluster Distance Distribution
+    intra_distances = []
+    cluster_labels = []
+    
+    for cluster_id, indices in clusters.items():
+        if len(indices) > 1:  # Need at least 2 images for distances
+            cluster_features = features[indices]
+            distances = 1 - cosine_similarity(cluster_features)
+            # Get upper triangle values
+            upper_tri = distances[np.triu_indices_from(distances, k=1)]
+            intra_distances.extend(upper_tri)
+            cluster_labels.extend([cluster_id] * len(upper_tri))
+    
+    plt.figure(figsize=(12, 6))
+    sns.boxplot(x=cluster_labels, y=intra_distances)
+    plt.title('Intra-cluster Distance Distribution')
+    plt.xlabel('Cluster ID')
+    plt.ylabel('Cosine Distance')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig(os.path.join(metrics_dir, 'intracluster_distances.png'))
+    plt.close()
+
 def run_analysis_from_baseline(baseline_path, output_dir):
     """Run enhanced analysis using saved baseline clustering"""
     logger.info(f"Loading baseline from: {baseline_path}")
@@ -220,6 +321,13 @@ def run_analysis_from_baseline(baseline_path, output_dir):
             image_names=baseline_data.get('image_names')
         )
         plot_minimum_distances(min_dist_analysis, output_dir)
+        
+        # Add new visualizations
+        logger.info("Generating distance matrix visualization...")
+        plot_distance_matrix(features, output_dir)
+        
+        logger.info("Generating cluster analysis visualizations...")
+        plot_cluster_analysis(clusters, features, output_dir)
         
         # Prepare comprehensive results
         results = {
