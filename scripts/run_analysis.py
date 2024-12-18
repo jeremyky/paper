@@ -109,9 +109,24 @@ def save_analysis_summary(exp_dir, metrics):
     plt.savefig(os.path.join(summary_dir, 'cluster_performance.png'))
     plt.close()
     
+    # Convert NumPy arrays to lists for JSON serialization
+    json_metrics = {
+        'monte_carlo': {
+            'n_simulations': metrics['monte_carlo']['n_simulations'],
+            'algorithm_mean_dist': float(metrics['monte_carlo']['algorithm_mean_dist']),
+            'random_mean': float(metrics['monte_carlo']['random_mean']),
+            'random_std': float(metrics['monte_carlo']['random_std']),
+            'random_min': float(metrics['monte_carlo']['random_min']),
+            'random_max': float(metrics['monte_carlo']['random_max']),
+            'p_value': float(metrics['monte_carlo']['p_value']),
+            'random_distances': metrics['monte_carlo']['random_distances'].tolist()
+        },
+        'clustering': metrics['clustering']  # Already contains Python native types
+    }
+    
     # Save raw metrics as JSON for future reference
     with open(os.path.join(summary_dir, "raw_metrics.json"), "w") as f:
-        json.dump(metrics, f, indent=4)
+        json.dump(json_metrics, f, indent=4)
 
 def main():
     """Run the complete analysis pipeline"""
