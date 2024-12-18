@@ -1,8 +1,8 @@
 Distance Matrix (Cosine Similarity):
 
-,tires,Achocolateice,ABOY,Awindmill3,22869912.thl
-tires,1.000,0.175,0.202,0.213,0.216
-Achocolateice,0.175,1.000,0.208,0.166,0.280
-ABOY,0.202,0.208,1.000,0.222,0.150
-Awindmill3,0.213,0.166,0.222,1.000,0.171
-22869912.thl,0.216,0.280,0.150,0.171,1.000
+,Azucchini9,Adecorativem2,Agirltrainin3,ANAILFILE,Akangarooandb
+Azucchini9,1.000,0.125,0.176,0.292,0.152
+Adecorativem2,0.125,1.000,0.248,0.199,0.256
+Agirltrainin3,0.176,0.248,1.000,0.251,0.316
+ANAILFILE,0.292,0.199,0.251,1.000,0.194
+Akangarooandb,0.152,0.256,0.316,0.194,1.000

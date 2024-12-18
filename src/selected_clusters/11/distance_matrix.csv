@@ -1,8 +1,8 @@
 Distance Matrix (Cosine Similarity):
 
-,Afirstaiddol2,leek,26431471.thl,Acanadagoose,AMINITRE7
-Afirstaiddol2,1.000,0.175,0.233,0.236,0.217
-leek,0.175,1.000,0.115,0.153,0.250
-26431471.thl,0.233,0.115,1.000,0.181,0.182
-Acanadagoose,0.236,0.153,0.181,1.000,0.162
-AMINITRE7,0.217,0.250,0.182,0.162,1.000
+,Aashtray14,Acucumber2,Aclimbersicep,AWIG10,AOLDBAT2
+Aashtray14,1.000,0.121,0.179,0.198,0.139
+Acucumber2,0.121,1.000,0.124,0.191,0.234
+Aclimbersicep,0.179,0.124,1.000,0.152,0.202
+AWIG10,0.198,0.191,0.152,1.000,0.187
+AOLDBAT2,0.139,0.234,0.202,0.187,1.000
