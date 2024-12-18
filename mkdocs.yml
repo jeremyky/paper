@@ -67,3 +67,5 @@ extra:
     - icon: fontawesome/brands/github
       link: https://github.com/jeremyky/remote-viewing-experiment
   generator: false 
+
+use_directory_urls: false
