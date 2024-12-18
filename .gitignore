@@ -69,3 +69,19 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Large data files
+*.json
+!package.json
+!package-lock.json
+*.pt
+*.pth
+*.ckpt
+*.h5
+*.npy
+*.npz
+
+# Model checkpoints
+checkpoints/
+*.pth
+model_weights/
