@@ -1,0 +1,10 @@
+{
+    "monte_carlo": {
+        "n_simulations": 1000,
+        "algorithm_mean_dist": 0.25002754645549025,
+        "random_mean": 0.2500275464554903,
+        "random_std": 5.410557748946589e-17,
+        "random_min": 0.25002754645549025,
+        "random_max": 0.25002754645549036,
+        "p_value": 1.0,
+        "random_distances": 

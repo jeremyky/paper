@@ -6,6 +6,23 @@ Edit the values below to modify the experiment behavior.
 """
 
 #------------------------------------------------------------------------------
+# Pipeline Configuration
+#------------------------------------------------------------------------------
+
+# Pipeline control
+PIPELINE_CONFIG = {
+    # Start from 'analysis' to skip feature extraction and clustering
+    "start_from": "analysis",
+    
+    # Use existing baseline clustering
+    "use_baseline": True,
+    
+    # Specify which baseline to use
+    "baseline_dir": "baseline_clusters",
+    "baseline_name": "baseline_clusters_v1"  # Point to your saved clustering
+}
+
+#------------------------------------------------------------------------------
 # Dataset Configuration
 #------------------------------------------------------------------------------
 
