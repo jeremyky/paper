@@ -1,8 +1,0 @@
-Distance Matrix (Cosine Similarity):
-
-,Achocolateice,AEAREXAM2,Aorcatoy4,hulahoop,Afirstaiddol2
-Achocolateice,1.000,0.135,0.202,0.198,0.231
-AEAREXAM2,0.135,1.000,0.203,0.137,0.228
-Aorcatoy4,0.202,0.203,1.000,0.174,0.254
-hulahoop,0.198,0.137,0.174,1.000,0.147
-Afirstaiddol2,0.231,0.228,0.254,0.147,1.000

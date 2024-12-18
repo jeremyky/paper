@@ -1,3 +1,0 @@
-Experiment run at: 2024-12-18 03:00:27.965436
-Input directory: /Users/jeremyky/Documents/Neuro/remote-viewing-experiment/data/raw/mm_unique_objects
-Feature directory: /Users/jeremyky/Documents/Neuro/remote-viewing-experiment/src/unique_objects_features

@@ -1,8 +1,0 @@
-Distance Matrix (Cosine Similarity):
-
-,AAFRICS13,gymbench,wetsuit1,Acucumber2,22859796.thl
-AAFRICS13,1.000,0.189,0.261,0.176,0.288
-gymbench,0.189,1.000,0.196,0.295,0.174
-wetsuit1,0.261,0.196,1.000,0.154,0.203
-Acucumber2,0.176,0.295,0.154,1.000,0.119
-22859796.thl,0.288,0.174,0.203,0.119,1.000

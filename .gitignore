@@ -2,6 +2,17 @@
 data/
 cifar_features/
 
+# Experiment outputs
+experiments/
+baseline_clusters/
+src/selected_clusters_global/
+src/unique_objects_features/
+
+# Data directories
+data/raw/
+data/features/
+data/results/
+
 # Generated features and results
 *.pt
 *.npy
@@ -14,6 +25,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -47,4 +59,13 @@ env/
 
 # OS
 .DS_Store
-Thumbs.db 
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
