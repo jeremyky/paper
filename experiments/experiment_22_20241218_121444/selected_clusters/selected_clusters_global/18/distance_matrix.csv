@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,ADOGTOY5,ACEMPOST,hotgreenpepper,Adolphin3,22875816.thl
+ADOGTOY5,1.000,0.140,0.274,0.294,0.279
+ACEMPOST,0.140,1.000,0.136,0.221,0.173
+hotgreenpepper,0.274,0.136,1.000,0.330,0.323
+Adolphin3,0.294,0.221,0.330,1.000,0.314
+22875816.thl,0.279,0.173,0.323,0.314,1.000

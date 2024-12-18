@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 import json
+import shutil
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,11 +46,18 @@ def create_experiment_dir():
     exp_dir = os.path.join(experiments_dir, f"experiment_{exp_num}_{timestamp}")
     os.makedirs(exp_dir, exist_ok=True)
     
-    # Create subdirectories for different analyses
-    os.makedirs(os.path.join(exp_dir, "original_analysis"), exist_ok=True)
-    os.makedirs(os.path.join(exp_dir, "global_analysis"), exist_ok=True)
-    
     return exp_dir
+
+def copy_analysis_outputs(src_dir, dest_dir):
+    """Copy analysis outputs to experiment directory"""
+    if not os.path.exists(src_dir):
+        logger.warning(f"Source directory not found: {src_dir}")
+        return
+        
+    # Copy entire directory structure
+    shutil.copytree(src_dir, dest_dir, dirs_exist_ok=True)
+    
+    logger.info(f"Copied analysis outputs from {src_dir} to {dest_dir}")
 
 def save_analysis_summary(exp_dir, metrics):
     """Save analysis metrics and create visualizations"""
@@ -141,6 +149,10 @@ def main():
         logger.info(f"Created experiment directory: {exp_dir}")
         os.environ['EXPERIMENT_DIR'] = exp_dir
         
+        # Create analysis directories
+        analysis_dir = os.path.join(exp_dir, "selected_clusters")
+        os.makedirs(analysis_dir, exist_ok=True)
+        
         metrics = {
             'monte_carlo': {},
             'clustering': {}
@@ -204,8 +216,18 @@ def main():
         
         metrics['clustering'] = analysis_results['cluster_metrics']
         
-        # Save analysis summary
-        save_analysis_summary(exp_dir, metrics)
+        # Copy analysis outputs
+        src_clusters_dir = os.path.join(project_root, "src", "selected_clusters_global")
+        if os.path.exists(src_clusters_dir):
+            copy_analysis_outputs(
+                src_clusters_dir,
+                os.path.join(analysis_dir, "selected_clusters_global")
+            )
+        
+        # Save metrics in the same directory
+        metrics_dir = os.path.join(analysis_dir, "metrics")
+        os.makedirs(metrics_dir, exist_ok=True)
+        save_analysis_summary(metrics_dir, metrics)
         
         # Save experiment info
         with open(os.path.join(exp_dir, "experiment_info.txt"), "w") as f:

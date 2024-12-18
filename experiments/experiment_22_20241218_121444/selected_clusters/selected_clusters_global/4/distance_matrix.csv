@@ -1,0 +1,8 @@
+Distance Matrix (Cosine Similarity):
+
+,Ahulahoop2,Aboardgame2,radish,Atoy51,Aflower103
+Ahulahoop2,1.000,0.090,0.113,0.121,0.167
+Aboardgame2,0.090,1.000,0.101,0.053,0.056
+radish,0.113,0.101,1.000,0.133,0.172
+Atoy51,0.121,0.053,0.133,1.000,0.174
+Aflower103,0.167,0.056,0.172,0.174,1.000

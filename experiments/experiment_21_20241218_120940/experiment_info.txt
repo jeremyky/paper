@@ -1,0 +1,8 @@
+Experiment run at: 2024-12-18 12:09:43.086687
+Input directory: /Users/jeremyky/Documents/Neuro/remote-viewing-experiment/data/raw/mm_unique_objects
+Feature directory: /Users/jeremyky/Documents/Neuro/remote-viewing-experiment/src/unique_objects_features
+Pipeline configuration:
+  start_from: analysis
+  use_baseline: True
+  baseline_dir: baseline_clusters
+  baseline_name: baseline_clusters_v1
