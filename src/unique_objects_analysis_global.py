@@ -114,7 +114,8 @@ def analyze_minimum_distances(features, clusters, image_names=None):
             'index_1': int(i),
             'index_2': int(j)
         }
-        if image_names:
+        # Only add image names if they exist and indices are valid
+        if image_names is not None and i < len(image_names) and j < len(image_names):
             pair_info.update({
                 'image_1': image_names[i],
                 'image_2': image_names[j]
@@ -137,7 +138,8 @@ def analyze_minimum_distances(features, clusters, image_names=None):
                 'index_1': int(indices[i]),
                 'index_2': int(indices[j])
             }
-            if image_names:
+            # Only add image names if they exist and indices are valid
+            if image_names is not None and indices[i] < len(image_names) and indices[j] < len(image_names):
                 pair_info.update({
                     'image_1': image_names[indices[i]],
                     'image_2': image_names[indices[j]]

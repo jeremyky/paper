@@ -240,6 +240,21 @@ def main():
         
         logger.info(f"Analysis complete! Results saved in {exp_dir}")
         
+        # After running your main analysis
+        random_metrics = random_group_analysis.analyze_random_groups(features)
+        comparison_stats = random_group_analysis.plot_random_vs_algorithm(
+            random_metrics,
+            algorithm_metrics,
+            output_dir
+        )
+
+        # Log results
+        logger.info("\nRandom vs Algorithm Comparison:")
+        logger.info(f"Random Mean Distance: {comparison_stats['random_stats']['mean_dist']:.4f}")
+        logger.info(f"Algorithm Mean Distance: {comparison_stats['algorithm_stats']['mean_dist']:.4f}")
+        logger.info(f"Random Min Distance: {comparison_stats['random_stats']['min_dist']:.4f}")
+        logger.info(f"Algorithm Min Distance: {comparison_stats['algorithm_stats']['min_dist']:.4f}")
+        
     except Exception as e:
         logger.error(f"Error during analysis: {str(e)}", exc_info=True)
         raise
